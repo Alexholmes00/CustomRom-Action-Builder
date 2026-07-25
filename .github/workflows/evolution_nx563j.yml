@@ -15,8 +15,10 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt install git curl ccache
-        git clone https://github.com/akhilnarang/scripts; cd scripts; sudo bash setup/android_build_env.sh
-        schedtool squashfs-tools xsltproc zip unzip zlib1g-dev ccache git-lfs neofetch
+        git clone https://github.com/akhilnarang/scripts
+        cd scripts
+        sudo bash setup/android_build_env.sh
+        sudo apt install -y neofetch
     - name: Set Git config and add repo tool
       run: |
         neofetch
