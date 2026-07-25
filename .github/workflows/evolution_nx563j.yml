@@ -14,10 +14,8 @@ jobs:
 
     - name: Install dependencies
       run: |
-        sudo apt update
-        sudo apt install -y openjdk-11-jdk bc bison build-essential curl flex git gnupg gperf \
-          libncurses5-dev libssl-dev libxml2 libxml2-utils lzop pngcrush repo rsync \
-          schedtool squashfs-tools xsltproc zip unzip zlib1g-dev ccache git-lfs neofetch
+        sudo apt install git curl ccache
+        git clone https://github.com/akhilnarang/scripts; cd scripts; sudo bash setup/android_build_env.sh
 
     - name: Set Git config and add repo tool
       run: |
@@ -29,32 +27,36 @@ jobs:
         chmod +x ~/bin/repo
         echo "$HOME/bin" >> $GITHUB_PATH
 
-    - name: Initialize AfterlifeOS repo
+    - name: Initialize evolution repo
       run: |
-        mkdir rom && cd rom
+        cd && mkdir evo && cd evo
         repo init -u https://github.com/Evolution-X/manifest -b cnb --git-lfs
         repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
 
     - name: Clone device tree, vendor, kernel
       run: |
-        cd rom
+        cd evo
         git clone https://github.com/LineageOS/android_device_nubia_msm8998-common.git device/nubia/msm8998-common
-        git clone https://github.com/LineageOS/android_device_nubia_nx563j.git device/nubia/nx563j
+        git clone https://github.com/Alexholmes00/android_device_nubia_nx563j.git device/nubia/nx563j
         git clone https://github.com/LineageOS/android_kernel_nubia_msm8998.git kernel/nubia/msm8998
         git clone https://github.com/TheMuppets/proprietary_vendor_nubia_nx563j.git vendor/nubia/nx563j
         git clone https://github.com/TheMuppets/proprietary_vendor_nubia_msm8998-common.git vendor/nubia/msm8998-common
 
     - name: Prepare for build
       run: |
-        cd rom
+        cd evo
         export ALLOW_MISSING_DEPENDENCIES=true
         export CCACHE_EXEC=$(which ccache)
         export USE_CCACHE=1
         ccache -M 50G
+        echo 'cd evo && source build/envsetup.sh && cd' >> ~/.bashrc
+        croot && git clone https://github.com/Evolution-X/vendor_evolution-priv_keys-template vendor/evolution-priv/keys
+        cd vendor/evolution-priv/keys
+        ./keys.sh
         source build/envsetup.sh
-        lunch lineage_nx563j-cp2a-user
+        lunch lineage_nx563j-cp2a-userdebug
 
     - name: Start build
       run: |
-        cd rom
+        cd evo
         m evolution
