@@ -33,7 +33,7 @@ jobs:
       run: |
         mkdir rom && cd rom
         repo init -u https://github.com/Evolution-X/manifest -b cnb --git-lfs
-        repo sync -c --no-tags --no-clone-bundle -j$(nproc --all)
+        repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
 
     - name: Clone device tree, vendor, kernel
       run: |
@@ -52,10 +52,9 @@ jobs:
         export USE_CCACHE=1
         ccache -M 50G
         source build/envsetup.sh
-        croot
-        breakfast nx563j
+        lunch lineage_nx563j-cp2a-user
 
     - name: Start build
       run: |
         cd rom
-        brunch nx563j -j$(nproc --all)
+        m evolution
